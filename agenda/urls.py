@@ -16,7 +16,7 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path, include
-from django.conf import settings # PARA MEDIA
+from django.conf import settings # PARA MEDIA || usar o pip install pillow
 from django.conf.urls.static import static # PARA MEDIA
 urlpatterns = [
      
