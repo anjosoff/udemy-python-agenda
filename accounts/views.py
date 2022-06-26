@@ -4,6 +4,7 @@ from django.contrib import messages,auth
 from django.core.validators import validate_email
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from .models import FormContato
 # Create your views here.
 def login (request):
     if request.method!='POST':
@@ -65,5 +66,34 @@ def register (request):
     return redirect('login')
 @login_required(redirect_field_name='login')
 def dashboard (request):
-
-    return render(request,'accounts/dashboard.html')
+    if request.method!='POST':
+        form=FormContato()
+        return render(request,'accounts/dashboard.html',{
+        'form':form,
+        })
+    form=FormContato(request.POST,request.FILES)
+    if not form.is_valid():
+        messages.error(request,'Erro ao gravar dados')
+        form=FormContato(request.POST)
+        return render(request,'accounts/dashboard.html',{
+        'form':form,
+        })
+    email=request.POST.get('email')
+    try:
+        validate_email(email)
+    except:
+        messages.error(request,'Email inválido')
+        return render(request,'accounts/dashboard.html',{
+        'form':form,
+        })
+    telefone=request.POST.get('telefone')
+    if len(telefone)<=11:
+        messages.error(request,'O número contém menos que 11 dígitos')
+        form=FormContato(request.POST)
+        return render(request,'accounts/dashboard.html',{
+        'form':form,
+        })
+    messages.success(request,f'O contato {request.POST.get("nome")} {request.POST.get("sobrenome")} foi adicionado')
+    form.save()
+    return redirect('dashboard')
+    
